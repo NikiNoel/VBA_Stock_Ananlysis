@@ -39,37 +39,46 @@ Sub AllStocksAnalysisRefactored()
     RowCount = Cells(Rows.Count, "A").End(xlUp).Row
     
     '1a) Create a ticker Index
-    
+    tickerIndex = 0
 
-    '1b) Create three output arrays   
-    
-    
-    ''2a) Create a for loop to initialize the tickerVolumes to zero. 
-    
+    '1b) Create three output arrays
+    Dim tickerVolumes(12) As Long
+    Dim tickerStartingPrices(12) As Single
+    Dim tickerEndingPrices(12) As Single
         
-    ''2b) Loop over all the rows in the spreadsheet. 
+    ''2a) Create a for loop to initialize the tickerVolumes to zero.
+    For i = 0 To 11
+        tickerVolumes(i) = 0
+    Next i
+        
+    ''2b) Loop over all the rows in the spreadsheet.
     For i = 2 To RowCount
     
         '3a) Increase volume for current ticker
-        
+        tickerVolumes(tickerIndex) = tickerVolumes(tickerIndex) + Cells(i, 8).Value
         
         '3b) Check if the current row is the first row with the selected tickerIndex.
         'If  Then
-            
-            
+        If Cells(i - 1, 1).Value <> tickers(tickerIndex) Then
+            tickerStartingPrices(tickerIndex) = Cells(i, 6).Value
             
         'End If
+        End If
         
         '3c) check if the current row is the last row with the selected ticker
          'If the next row’s ticker doesn’t match, increase the tickerIndex.
         'If  Then
+        If Cells(i + 1, 1).Value <> tickers(tickerIndex) Then
             
+            ' assign value to the tickerEndingPrice(tickerIndex)
+             tickerEndingPrices(tickerIndex) = Cells(i, 6).Value
             
-
-            '3d Increase the tickerIndex. 
+            '3d Increase the tickerIndex.
+            tickerIndex = tickerIndex + 1
             
             
         'End If
+        End If
     
     Next i
     
@@ -77,6 +86,16 @@ Sub AllStocksAnalysisRefactored()
     For i = 0 To 11
         
         Worksheets("All Stocks Analysis").Activate
+        
+        ' Record tickers information in summary table
+        ' Record the ticker
+        Cells(4 + i, 1).Value = tickers(i)
+        
+        ' Record the tickerVolumes
+        Cells(4 + i, 2).Value = tickerVolumes(i)
+        
+        ' Record the return
+        Cells(4 + i, 3).Value = (tickerEndingPrices(i) / tickerStartingPrices(i)) - 1
         
         
     Next i
@@ -109,4 +128,8 @@ Sub AllStocksAnalysisRefactored()
     endTime = Timer
     MsgBox "This code ran in " & (endTime - startTime) & " seconds for the year " & (yearValue)
 
+End Sub
+
+Sub ClearWorksheet()
+    Cells.Clear
 End Sub
